@@ -157,6 +157,7 @@ def Mean_cal_CUDA(dataSet,clusterAssment,centroids,k):
     cuda.memcpy_dtoh(count, count_gpu)
     #print(sum(count))
     return centroids
+
 # k-means 聚类算法
 def kMeans(dataSet, k, gpu, means, init_centroids,distMeans=distEclud):
     start = time.time()
@@ -251,13 +252,16 @@ myCentroids2, clustAssign2,t2,iter2 = Kmeans_gpu_integrate(dataset, k, init_cent
 myCentroids, clustAssign,t3,iter3 = kMeans(dataset, k, True, False, init_centroids)
 #myCentroids, clustAssign,t2,iter2 = kMeans(dataset, 3, False,init_centroids)
 
+# sklearn benchmark
 start = time.time()
 cluster = KMeans(n_clusters=k,random_state=0).fit(dataset)
 end = time.time()
+
 print(t2,t3,end-start)
+
 print("Kmeans:")
 print(myCentroids)
 print(clustAssign)
-print("Kmeans gu integrate:")
+print("Kmeans gpu integrate:")
 print(myCentroids2)
-print(clusterAssign2)
+print(clustAssign2)
