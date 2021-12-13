@@ -15,7 +15,8 @@ class GPU:
         self.mod = self.getSourceModule()
         pass
     def getSourceModule(self):
-        kernelwrapper = """#include <stdio.h>
+        kernelwrapper = """
+        #include <stdio.h>
             __global__ void dist(float* A, const float* C, int* Y, int n, int m, int k){
                 int tid = blockIdx.x * blockDim.x + threadIdx.x;
                 if (tid < n){
@@ -111,6 +112,7 @@ def cluster_assign_python(dataSet, centroids, clusterAssment, distMeans,clusterC
             clusterAssment[i] = minIndex
               # 并将第i个数据点的分配情况存入字典
     return clusterAssment,clusterChanged
+
 
 def cluster_assign_CUDA(dataSet, centroids, clusterAssment, distMeans,clusterChanged):
     n = np.shape(dataSet)[0]
@@ -231,6 +233,8 @@ def Kmeans_gpu_integrate(dataSet, k, init_centroids):
     print(iter)
     end = time.time()
     return centroids, clusterAssment, end - start, iter
+
+
 # --------------------测试----------------------------------------------------
 # 用测试数据及测试kmeans算法
 m = 5
@@ -251,5 +255,9 @@ start = time.time()
 cluster = KMeans(n_clusters=k,random_state=0).fit(dataset)
 end = time.time()
 print(t2,t3,end-start)
+print("Kmeans:")
 print(myCentroids)
 print(clustAssign)
+print("Kmeans gu integrate:")
+print(myCentroids2)
+print(clusterAssign2)
