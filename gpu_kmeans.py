@@ -29,7 +29,7 @@ class GPU:
                     for (int j = 0; j < k; j ++){
                         current = 0;
                         for (int i = 0; i < m; i ++){
-                            current += pow((A[tid * m + i] - C[j * m + i]), 2);
+                            current += (A[tid * m + i] - C[j * m + i]) * (A[tid * m + i] - C[j * m + i]);
                             //current += pow((data[t][i] - C[j * m + i]), 2);
                         }
                         //printf("  dist:%f;d:%f  ", current,d);
@@ -60,8 +60,7 @@ class GPU:
                     for (int j = 0; j < k; j ++){
                         current = 0;
                         for (int i = 0; i < m; i ++){
-                            //current += pow((A[tid * m + i] - C[j * m + i]), 2);
-                            current += pow((data[t][i] - C[j * m + i]), 2);
+                            current += (data[t][i] - C[j * m + i]) * (data[t][i] - C[j * m + i]);
                         }
                         //printf("  dist:%f;d:%f  ", current,d);
                         if(current < d){
@@ -443,8 +442,8 @@ def Kmeans_gpu_partial(dataSet, k, init_centroids):
 #     iter[j] /= 10
 m = 8
 k = 8
-x = np.random.normal(loc=1, scale=2, size=(10000, m))
-y = np.random.normal(loc=3, scale=1, size=(10000, m))
+x = np.random.normal(loc=1, scale=2, size=(100000, m))
+y = np.random.normal(loc=3, scale=1, size=(100000, m))
 dataset = np.vstack((x, y)).astype(np.float32)
 init_centroids = randCent(dataset, k).astype(np.float32)
 inst = GPU()
