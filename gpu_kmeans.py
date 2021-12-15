@@ -18,10 +18,10 @@ class GPU:
         pass
 
     def getSourceModule(self):
-        kernelwrapper = """#include <stdio.h>
+        kernelwrapper = """
+            #include <stdio.h>
             __global__ void dist(float* A, const float* C, int* Y, int n, int m, int k){
                 int tid = blockIdx.x * blockDim.x + threadIdx.x;
-                int t = threadIdx.x;
                 if (tid < n){
                     float d = 999999.9f;
                     int index = 0;
@@ -226,7 +226,7 @@ def cluster_assign_CUDA(dataSet, centroids, clusterAssment, distMeans, clusterCh
     func = mod.get_function("dist")
     func(A_gpu, C_gpu, Y_gpu, np.int32(n), np.int32(m), np.int32(k), block=blockDim, grid=gridDim)
     cuda.memcpy_dtoh(clusterAssment, Y_gpu)
-    if ((temp == clusterAssment).all()):
+    if (temp == clusterAssment).all():
         pass
     else:
         clusterChanged = True
@@ -284,7 +284,6 @@ def kMeans(dataSet, k, gpu, means, init_centroids, distMeans=distEclud):
                 centroids[cent, :] = np.mean(ptsInClust, axis=0)
         iter += 1
     end = time.time()
-    print(iter)
     return centroids, clusterAssment, end - start, iter
 
 
@@ -352,7 +351,6 @@ def Kmeans_gpu_integrate(dataSet, k, init_centroids, dist_share, sum_share):
             clusterChanged = True
         iter += 1
     cuda.memcpy_dtoh(centroids, C_gpu)
-    print(iter)
     end = time.time()
     return centroids, clusterAssment, end - start, iter, time_
 
@@ -421,7 +419,6 @@ def Kmeans_gpu_partial(dataSet, k, init_centroids):
             clusterChanged = True
         iter += 1
     cuda.memcpy_dtoh(centroids, C_gpu)
-    print(iter)
     end = time.time()
     return centroids, clusterAssment, end - start, iter, time_
 
@@ -448,24 +445,29 @@ m = 8
 k = 8
 x = np.random.normal(loc=1, scale=2, size=(10000, m))
 y = np.random.normal(loc=3, scale=1, size=(10000, m))
-dataset = np.vstack((x,y)).astype(np.float32)
+dataset = np.vstack((x, y)).astype(np.float32)
 init_centroids = randCent(dataset, k).astype(np.float32)
 inst = GPU()
 mod = inst.mod
 
 # myCentroids, clustAssign,t,iter,time_ = Kmeans_gpu_partial(dataset, k, init_centroids)
-myCentroids1, clustAssign1,t1,iter1,time_1 = Kmeans_gpu_integrate(dataset, k, init_centroids, True, True)
-myCentroids2, clustAssign2,t2,iter2,time_2 = Kmeans_gpu_integrate(dataset, k, init_centroids, False, False)
+myCentroids1, clustAssign1, t1, iter1, time_1 = Kmeans_gpu_integrate(dataset, k, init_centroids, False, False)
+myCentroids2, clustAssign2, t2, iter2, time_2 = Kmeans_gpu_integrate(dataset, k, init_centroids, False, True)
+myCentroids3, clustAssign3, t3, iter3, time_3 = Kmeans_gpu_integrate(dataset, k, init_centroids, True, False)
+myCentroids4, clustAssign4, t4, iter4, time_4 = Kmeans_gpu_integrate(dataset, k, init_centroids, True, True)
 # myCentroids3, clustAssign3,t3,iter3 = kMeans(dataset, k, True, False, init_centroids)
 # myCentroids, clustAssign,t2,iter2 = kMeans(dataset, 3, False,init_centroids)
 
 start = time.time()
-cluster = KMeans(n_clusters=k,max_iter=2000,n_init = 1,init = init_centroids,algorithm="full",tol=0.00000001).fit(dataset)
+cluster = KMeans(n_clusters=k, max_iter=2000, n_init=1, init=init_centroids,
+                 algorithm="full", tol=0.00000001).fit(dataset)
 end = time.time()
 
 print(iter1)
 print(iter2)
+print(iter3)
+print(iter4)
 print(cluster.n_iter_)
-print(time_1, time_2, end-start)
+print(time_1, time_2, time_3, time_4, end - start)
 # print(myCentroids)
 # print(cluster.cluster_centers_)
