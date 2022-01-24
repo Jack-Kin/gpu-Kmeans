@@ -1,4 +1,1 @@
-# e4750_2021Fall_AMAC
-* all of the project code is in `gpu_kemans.py`
-* report is also contained
-
+K-means clustering is a classic iterative clustering algorithm. The main objective of the K-Means algorithm is to minimize the sum of distances between the data points and the cluster centroid. In this paper, we explored the acceleration of the K-means clustering algorithm in the programming language CUDA using NVIDIA Graphics Processing Units (GPUs). We proposed 4 ways to accelerate the classic K-means clustering algorithm and compared the speed-up results with the naive python implementation and the optimized algorithm provided by Sklearn. We achieved around 5 times the speed-up on average with our fastest implementation compared to the result of the Sklearn K-means algorithm when the number of data points comes to 1,000,000 with dimension of 8 and the cluster number is set to 5.
